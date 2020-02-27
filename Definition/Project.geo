@@ -5,16 +5,15 @@ Include "Project_data.geo" ;
 
 Coherence;
 
-Num_litz = 10; //Cas test
+Num_litz = 10; 
 
 //Internal radius (that of the air)
 If (Flag_Insulation )
-	perimeter = Num_litz*(2*(Delta+Insulation)+4*mili);  //4*mili corresponds to a value
-	Rayon     = perimeter/(2*Pi); 
+	perimeter = Num_litz*(2*(Delta+Insulation)+interspace);  
 Else
-	perimeter = Num_litz*(2*Delta+4*mili);  //4*mili corresponds to a value (interwinding)
-	Rayon     = perimeter/(2*Pi); 	
+	perimeter = Num_litz*(2*Delta+interspace);  /	 	
 EndIf
+Rayon     = perimeter/(2*Pi);
 
 //Non-insulated conductor
 cp = newp ;
@@ -120,7 +119,6 @@ If (Flag_Insulation)
 	For i In {0:#Surf_c_w_i()-1}
 		e() += BooleanDifference{Surface{Surf_c_w_i(i)};Delete;}{Surface{Surf_c(i)};Delete;};
 	EndFor
-	//I will need x() for the physicals:
  	x()  = Boundary{Surface{d(0)};};
 	x() -= Boundary{Surface{e(0):e(#e()-1)};};
 Else 
