@@ -1,11 +1,6 @@
-// Remarque: j'ai enlevé le 'include project_data' parce qu'il y avait un probleme de syntaxe lorsque je runais le code...
-// Du coup certain paramètres sont redéfini en dur ici comme le Flag_Insulation... J'essaie de régler le problème de syntaxe, 
-// j'ai fait ça comme ça en attendant pour qu'on puisse déjà avancer dans les simulations :) 
-
-Include "Project_data.geo" ;
-
+Include "Project_data.geo";
 Group {
-  Skin_Airbox = Region[500000]; //Ground :) 
+  Skin_Airbox = Region[500000]; 
   Surf_Airbox = Region[600000];
 
   Skin_conductors = Region[700000];
@@ -20,9 +15,8 @@ Group {
 }
 
 Function {
-   //eps0 = 8.854187818e-12; 
-   //Ins_epsr = 3.5;
-    epsilon[Surf_Airbox]        = 1. * eps0;
+  epsr = Ins_eps;
+  epsilon[Surf_Airbox]        = 1. * eps0;
   If (Flag_Insulation )
     epsilon[Surf_Insulations] = Ins_epsr * eps0;  
   EndIf
@@ -32,7 +26,7 @@ Constraint {
   { Name Dirichlet_Ele; Type Assign;
     Case {
       { Region Skin_Airbox    ; Value 0.     ; }
-      { Region Skin_conductors; Value 550000; }
+      { Region Skin_conductors; Value Voltage; }
     }
   }
 }
@@ -102,8 +96,8 @@ PostOperation {
      Operation {
        Print [ v, OnElementsOf Vol_Ele, File "Homework1_V.pos" ];
        Print [ e, OnElementsOf Vol_Ele, File "Homework1_E.pos" ];
-	   //Print [ e, OnLine {{e,5,0}{15-e,5,0}}{500}, File "Cut_e.pos" ];
      }
+   }
   }
 }
 
