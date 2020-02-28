@@ -1,5 +1,5 @@
 // Gmsh project created on Mon Feb 24 13:28:48 2020
-SetFactory("OpenCASCADE");
+// SetFactory("OpenCASCADE");
 
 //KMS defined
 
@@ -33,9 +33,9 @@ DefineConstant[ C_mu              = { 0.999994 , Name StrCat[PathMaterialsParame
 DefineConstant[ Voltage_supply_UI = { 550 , Name StrCat[PathElectricalParameters,"010Supply voltage (in kV)"],Highlight "Orange"} ]                        ;
 DefineConstant[ Breakdown_vol_UI  = { 3 , Name StrCat[PathElectricalParameters,"030Electrical breakdown (in MV per m)"],Highlight "Orange"} ]              ;
 DefineConstant[ Flag_Insulation   = { 0, Choices{0,1}, Name StrCat[PathMaterialsParameters, "030Add insulation layer?" ] } ]                               ;
-DefineConstant[ R_airbox          = { 5, Name StrCat[PathGeometricParameters, "The minimum airbox radius (in m)" ] } ]                                            ;
-DefineConstant[ Num_litz          = { 1, Name StrCat[PathGeometricParameters, "Number of small conductors" ] } ]                                            ;
-DefineConstant[ d_cond          = { 1, Name StrCat[PathGeometricParameters, "Distance bewteen the small conductors surface (in mm)" ] } ]                                            ;
+DefineConstant[ R_airbox          = { 5, Name StrCat[PathGeometricParameters, "The minimum airbox radius (in m)" ] } ]                                     ;
+DefineConstant[ Num_litz          = { 1, Min 1, Max 10, Step 1, Name StrCat[PathGeometricParameters, "Number of small conductors" ] } ]                                           ;
+DefineConstant[ d_cond          = { 1, Name StrCat[PathGeometricParameters, "Distance bewteen the small conductors surface (in mm)" ] } ]                  ;
 //Ajouter résistance de la charge 
 
 If (Flag_Insulation )
@@ -56,7 +56,7 @@ Voltage = Voltage_supply_UI * kilo;
 d_cond  = d_cond * mili		  	  ;						  // Distance betwen the surface of two neighbouring small conductors
 
 //Useful computations
-Delta   = Sqrt(C_rho/(Pi*mu*freq)) 						; // Skin depth = the ideal Litz wires radius
+Delta   = Sqrt[C_rho/(Pi*mu*freq)] 						; // Skin depth = the ideal Litz wires radius
 Surf    = Pi*(Rext*Rext-((Rext-Delta)*(Rext-Delta))) 	; // The hollow conductor's effective surface (m^2)
 //Resis   = C_rho * pul / Surf       						; // Resistance of a 1meter length hollow conductor
 //I_total = Voltage / Resis         						; // The total current in the hollow conductor

@@ -2,8 +2,7 @@
 // Du coup certain paramètres sont redéfini en dur ici comme le Flag_Insulation... J'essaie de régler le problème de syntaxe, 
 // j'ai fait ça comme ça en attendant pour qu'on puisse déjà avancer dans les simulations :) 
 
-//Include "Project_data.geo" ;
-Flag_Insulation = 0;
+Include "Project_data.geo" ;
 
 Group {
   Skin_Airbox = Region[500000]; //Ground :) 
@@ -21,8 +20,8 @@ Group {
 }
 
 Function {
-   eps0 = 8.854187818e-12; 
-   Ins_epsr = 3.5;
+   //eps0 = 8.854187818e-12; 
+   //Ins_epsr = 3.5;
     epsilon[Surf_Airbox]        = 1. * eps0;
   If (Flag_Insulation )
     epsilon[Surf_Insulations] = Ins_epsr * eps0;  
@@ -98,9 +97,6 @@ PostProcessing {
   }
 }
 
-e = 1.e-7; // tolerance to ensure that the cut is inside the simulation domain
-h = 2.e-3; // vertical position of the cut
-
 PostOperation {
   { Name Map; NameOfPostProcessing EleSta_v;
      Operation {
@@ -108,12 +104,6 @@ PostOperation {
        Print [ e, OnElementsOf Vol_Ele, File "Homework1_E.pos" ];
 	   //Print [ e, OnLine {{e,5,0}{15-e,5,0}}{500}, File "Cut_e.pos" ];
      }
-  }
-  { Name Cut; NameOfPostProcessing EleSta_v;
-		// same cut as above, with more points and exported in raw text format
-		Operation {
-			Print [ e, OnLine {{e,5,0}{15-e,5,0}} {15000}, Format TimeTable, File "d_cond_study\5cond\d50mm.txt" ];
-		}
   }
 }
 
