@@ -30,9 +30,9 @@ Else
 EndIf
 
 // Mesh size
-lc_Conductor  = Rc / 10     ;
+lc_Conductor  = Rc / 50     ;
 lc_Insulation = lc_Conductor;
-lc_Air        = (2*param)/20;
+lc_Air        = (2*param)/50;
 
 //********************* Creation of the geometry *********************//
 //Non-insulated conductors

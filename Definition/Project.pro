@@ -15,9 +15,9 @@ Group {
 }
 
 Function {
-  epsr = Ins_eps;
   epsilon[Surf_Airbox]        = 1. * eps0;
   If (Flag_Insulation )
+	epsr = Ins_epsr;
     epsilon[Surf_Insulations] = Ins_epsr * eps0;  
   EndIf
 }
@@ -99,5 +99,5 @@ PostOperation {
      }
    }
   }
-}
+
 
