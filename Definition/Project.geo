@@ -141,7 +141,6 @@ If (Flag_Insulation)
 	For i In {0:#Surf_c_w_i()-1}
 		e() += BooleanDifference{Surface{Surf_c_w_i(i)};Delete;}{Surface{Surf_c(i)};Delete;};
 	EndFor
-	//I will need x() for the physicals:
  	x()  = Boundary{Surface{d(0)};};
 	x() -= Boundary{Surface{e(0):e(#e()-1)};};
 Else 
