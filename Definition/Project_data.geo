@@ -1,5 +1,5 @@
 // Gmsh project created on Mon Feb 24 13:28:48 2020
-SetFactory("OpenCASCADE");
+// SetFactory("OpenCASCADE");
 
 //KMS defined
 
@@ -33,7 +33,9 @@ DefineConstant[ C_mu              = { 0.999994 , Name StrCat[PathMaterialsParame
 DefineConstant[ Voltage_supply_UI = { 550 , Name StrCat[PathElectricalParameters,"010Supply voltage (in kV)"],Highlight "Orange"} ]                        ;
 DefineConstant[ Breakdown_vol_UI  = { 3 , Name StrCat[PathElectricalParameters,"030Electrical breakdown (in MV per m)"],Highlight "Orange"} ]              ;
 DefineConstant[ Flag_Insulation   = { 0, Choices{0,1}, Name StrCat[PathMaterialsParameters, "030Add insulation layer?" ] } ]                               ;
-DefineConstant[ R_airbox          = { 5, Name StrCat[PathGeometricParameters, "The minimum airbox radius" ] } ]                                            ;
+DefineConstant[ R_airbox          = { 5, Name StrCat[PathGeometricParameters, "The minimum airbox radius (in m)" ] } ]                                     ;
+DefineConstant[ Num_litz          = { 1, Min 1, Max 10, Step 1, Name StrCat[PathGeometricParameters, "Number of small conductors" ] } ]                                           ;
+DefineConstant[ d_cond          = { 1, Name StrCat[PathGeometricParameters, "Distance bewteen the small conductors surface (in mm)" ] } ]                  ;
 //Ajouter résistance de la charge 
 
 If (Flag_Insulation )
@@ -44,32 +46,29 @@ If (Flag_Insulation )
 EndIf 
 
 //Real parameters    
-
 Rext    = Rext_UI * mili          ;
 Rint    = Rint_UI * mili          ;
+Rint 	= Rext 					  ;
 mu      = mu_0 * C_mu             ;
 C_rho   = C_rho_UI * nano         ;
-Break_V = Breakdown_vol_UI * Mega ; //interspire? 
+Break_V = Breakdown_vol_UI * Mega ; 					  //interspire? 
 Voltage = Voltage_supply_UI * kilo;
+d_cond  = d_cond * mili		  	  ;						  // Distance betwen the surface of two neighbouring small conductors
 
 //Useful computations
-
-Surf    = Pi*(Rext*Rext-Rint*Rint) ; //The hollow conductor's surface (m^2)
-Resis   = C_rho * pul / Surf       ; //Resistance of a 1meter length hollow conductor
-I_total = Voltage / Resis          ; //The total current in the hollow conductor
-Delta   = Sqrt(C_rho/(Pi*mu*freq)) ; //Skin depth = the minimum Litz wires radius
+Delta   = Sqrt[C_rho/(Pi*mu*freq)] 						; // Skin depth = the ideal Litz wires radius
+Surf    = Pi*(Rext*Rext-((Rext-Delta)*(Rext-Delta))) 	; // The hollow conductor's effective surface (m^2)
+//Resis   = C_rho * pul / Surf       						; // Resistance of a 1meter length hollow conductor
+//I_total = Voltage / Resis         						; // The total current in the hollow conductor
 
 //Parameters of the 2D Litz wires:
 
-S_litz   = Pi * Delta * Delta   ;
-R_small  = C_rho * pul / S_litz ; //per unit length **ADD LOAD'S RESISTANCE!!
-I_litz   = Voltage / R_small    ; 
-Num_litz = I_total / I_litz     ;
-
-// Characteristic lengths and layers
-lc_Conductor  = Delta / 3;
-lc_Insulation = lc_Conductor;
-lc_Air        = 10 *lc_Conductor;
+//S_litz   = Pi * Delta * Delta   						;
+//R_small  = C_rho * pul / S_litz 						; //per unit length **ADD LOAD'S RESISTANCE!!
+//I_litz   = Voltage / R_small    						; 
+// Num_litz = I_total / I_litz     						;
+Eff_surf_new = Surf/(Num_litz)							; // Effective surface of one small conductor (assume Rc>delta ==> not true if nb_cond>21)
+Rc = ((Eff_surf_new)+(Pi*Delta*Delta))/(2*Pi*Delta)			; // Small conductors radius
 
 //Fogot the airbox parameters:
 //THE USE OF THE BREAKDOWN VOLTAGE??? Paschen law or what? 

@@ -1,3 +1,7 @@
+// Remarque: j'ai enlevé le 'include project_data' parce qu'il y avait un probleme de syntaxe lorsque je runais le code...
+// Du coup certain paramètres sont redéfini en dur ici comme le Flag_Insulation... J'essaie de régler le problème de syntaxe, 
+// j'ai fait ça comme ça en attendant pour qu'on puisse déjà avancer dans les simulations :) 
+
 Include "Project_data.geo" ;
 
 Group {
@@ -16,7 +20,8 @@ Group {
 }
 
 Function {
-  //eps0 = 8.854187818e-12; Deja définie dans le fichier  data
+   //eps0 = 8.854187818e-12; 
+   //Ins_epsr = 3.5;
     epsilon[Surf_Airbox]        = 1. * eps0;
   If (Flag_Insulation )
     epsilon[Surf_Insulations] = Ins_epsr * eps0;  
@@ -27,9 +32,7 @@ Constraint {
   { Name Dirichlet_Ele; Type Assign;
     Case {
       { Region Skin_Airbox    ; Value 0.     ; }
-      If (Flag_Insulation)
-      { Region Skin_conductors; Value Voltage; }
-      EndIf
+      { Region Skin_conductors; Value 550000; }
     }
   }
 }
@@ -58,7 +61,7 @@ Formulation {
       { Name v; Type Local; NameOfSpace Hgrad_v_Ele; }
     }
     Equation {
-      Integral { [ Ins_epsr[] * Dof{d v} , {d v} ];
+      Integral { [ epsilon[] * Dof{d v} , {d v} ];
 	    In Vol_Ele; Jacobian Vol; Integration Int; }
     }
   }
@@ -91,6 +94,16 @@ PostProcessing {
         }
       }
     }
+  }
+}
+
+PostOperation {
+  { Name Map; NameOfPostProcessing EleSta_v;
+     Operation {
+       Print [ v, OnElementsOf Vol_Ele, File "Homework1_V.pos" ];
+       Print [ e, OnElementsOf Vol_Ele, File "Homework1_E.pos" ];
+	   //Print [ e, OnLine {{e,5,0}{15-e,5,0}}{500}, File "Cut_e.pos" ];
+     }
   }
 }
 

@@ -1,27 +1,58 @@
 // Gmsh project created on Mon Feb 24 15:19:05 2020
 SetFactory("OpenCASCADE");
 
-Include "Project_data.geo" ; 
+Include "Project_data.geo"; 
 
 Coherence;
 
-Num_litz = 10; 
+// Num_litz = 10; //Cas test
 
-//Internal radius (that of the air)
-If (Flag_Insulation )
-	perimeter = Num_litz*(2*(Delta+Insulation)+interspace);  
+//********************* Geometrical calculations *********************//
+
+// Dimension of the new conductor
+alpha = 2*Pi/Num_litz; 
+If (Num_litz == 1)
+	Rayon  = 0;
 Else
-	perimeter = Num_litz*(2*Delta+interspace);  /	 	
+	If (Flag_Insulation )
+		Rayon  = (2*(Rc+d_cond))/(Sqrt((1-Cos(alpha))*(1-Cos(alpha))+(Sin(alpha))*(Sin(alpha))))+Insulation; // Imaginary circle radius
+	Else
+		Rayon  = (2*(Rc+d_cond))/(Sqrt((1-Cos(alpha))*(1-Cos(alpha))+(Sin(alpha))*(Sin(alpha)))); // Imaginary circle radius		
+	EndIf
 EndIf
-Rayon     = perimeter/(2*Pi);
+// Previous way of computing the new conductor dimension... I think the computation of the perimeter is a simplified approached
+// where the perimeter of circle is approximated by a finite sum of straight line... The other version does not make this assumption
+// If (Flag_Insulation )
+	// perimeter = Num_litz*(2*(Rc+Insulation)+4*mili);  //4*mili corresponds to a value
+	// Rayon     = perimeter/(2*Pi); 
+// Else
+	// perimeter = Num_litz*(2*Rc+4*mili);  //4*mili corresponds to a value (interwinding)
+	// Rayon     = perimeter/(2*Pi); 	
+// EndIf
 
+
+// Domain size 
+If (Flag_Insulation)
+	param = Rayon + (Rc + Insulation) + R_airbox; //The real value
+	// param = 3*Rayon+2*Insulation;
+Else
+	// param = 3*Rayon;
+	param = Rayon + (Rc) + R_airbox; //The real value
+EndIf
+
+// Mesh size
+lc_Conductor  = Rc / 50;
+lc_Insulation = lc_Conductor;
+lc_Air        = (2*param)/50;
+
+//********************* Creation of the geometry *********************//
 //Non-insulated conductor
 cp = newp ;
 Point(cp)   = {Rayon        , 0    , 0 ,lc_Conductor} ;
-Point(cp+1) = {Rayon + Delta, 0    , 0 ,lc_Conductor} ;
-Point(cp+2) = {Rayon        , Delta, 0 ,lc_Conductor} ;
-Point(cp+3) = {Rayon - Delta, 0    , 0 ,lc_Conductor} ;
-Point(cp+4) = {Rayon        ,-Delta, 0 ,lc_Conductor} ;
+Point(cp+1) = {Rayon + Rc, 0    , 0 ,lc_Conductor} ;
+Point(cp+2) = {Rayon        , Rc, 0 ,lc_Conductor} ;
+Point(cp+3) = {Rayon - Rc, 0    , 0 ,lc_Conductor} ;
+Point(cp+4) = {Rayon        ,-Rc, 0 ,lc_Conductor} ;
 
 cl  = newl ;
 Circle(cl)   = {cp+1, cp, cp+2} ;
@@ -42,15 +73,6 @@ b_c() += {skin_conductor()} ;
 Surf_c() += cs;
 
 //Air box
-If (Flag_Insulation )
-//param = Rayon + 2*(Delta + Insulation) + R_airbox; //The real value
-	param = 3*Rayon+2*Insulation;
-Else
-	param = 3*Rayon;
-//param = Rayon + 2*(Delta) + R_airbox; //The real value
-
-EndIf
-
 cp = newp;
  	Point(cp)   = { param, param, 0 , lc_Air} ;
 	Point(cp+1) = {-param, param, 0 , lc_Air} ;
@@ -85,10 +107,10 @@ EndFor
 If (Flag_Insulation)
 	cp = newp;
 	Point(cp)   = {Rayon                     , 0                 , 0 ,lc_Conductor} ;
-	Point(cp+1) = {Rayon + Delta + Insulation, 0                 , 0 ,lc_Insulation} ;
-	Point(cp+2) = {Rayon                     , Delta + Insulation, 0 ,lc_Insulation} ;
-	Point(cp+3) = {Rayon - Delta - Insulation, 0                 , 0 ,lc_Insulation} ;
-	Point(cp+4) = {Rayon                     ,-Delta - Insulation, 0 ,lc_Insulation} ;
+	Point(cp+1) = {Rayon + Rc + Insulation, 0                 , 0 ,lc_Insulation} ;
+	Point(cp+2) = {Rayon                     , Rc + Insulation, 0 ,lc_Insulation} ;
+	Point(cp+3) = {Rayon - Rc - Insulation, 0                 , 0 ,lc_Insulation} ;
+	Point(cp+4) = {Rayon                     ,-Rc - Insulation, 0 ,lc_Insulation} ;
 
 	cl = newl;
 	Circle(cl)   = {cp+1, cp, cp+2} ;
@@ -108,7 +130,7 @@ If (Flag_Insulation)
 	Plane Surface(c_i) = {ill};
 	Surf_c_w_i() += {c_i}     ; 
 
-//Circulare Arrangement of the insulated conductor:
+// Circulare Arrangement of the insulated conductor:
 	For i In {1:Num_litz-1}
 		out_i[] = Rotate{{0,0,1},{0,0,0},2*Pi/Num_litz}{Duplicata{Surface{c_i};}}; //c_i = conductor with insulation
  		c_i  = out_i[0]                  ;
@@ -127,7 +149,7 @@ Else
 	x() -= b_c();
 EndIf
 
-//Defining the physicals
+//********************* Definition of the physicals *********************//
 	//Airbox
 Physical Surface("AirbBox with holes", SURF_AIRBOX) = {d(0)};
 Physical Line("Airbox Skin", SKIN_AIRBOX) ={x()} ;//Fucking air box ! 
