@@ -18,7 +18,7 @@ Else
 	If (Flag_Insulation )
 		Rayon  = (2*(Rc+d_cond))/(Sqrt((1-Cos(alpha))*(1-Cos(alpha))+(Sin(alpha))*(Sin(alpha))))+Insulation; // Imaginary circle radius
 	Else
-		Rayon  = (2*(Rc+d_cond))/(Sqrt((1-Cos(alpha))*(1-Cos(alpha))+(Sin(alpha))*(Sin(alpha))));		
+		Rayon  = (2*(Rc+d_cond))/(Sqrt((1-Cos(alpha))*(1-Cos(alpha))+(Sin(alpha))*(Sin(alpha))));	     // Imaginary circle radius	
 	EndIf
 EndIf
 
