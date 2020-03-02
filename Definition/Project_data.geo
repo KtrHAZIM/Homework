@@ -46,18 +46,17 @@ EndIf
 //Real parameters    
 Rext    = Rext_UI * mili          ;
 Rint    = Rint_UI * mili          ;
-Rint 	= Rext 					  ;
 mu      = mu_0 * C_mu             ;
 C_rho   = C_rho_UI * nano         ;
 Break_V = Breakdown_vol_UI * Mega ; 					  
 Voltage = Voltage_supply_UI * kilo;
-d_cond  = d_cond * mili		  	  ;				       // Distance betwen the surface of two neighbouring small conductors
+d_cond  = d_cond * mili		  ;				       // Distance betwen the surface of two neighbouring small conductors
 
 //Useful computations
 Delta   = Sqrt[C_rho/(Pi*mu*freq)] 					; // Skin depth = the ideal Litz wires radius
-Surf    = Pi*(Rext*Rext-((Rext-Delta)*(Rext-Delta))); // The hollow conductor's effective surface (m^2)
+Surf    = Pi*(Rext*Rext-((Rext-Delta)*(Rext-Delta)))			; // The hollow conductor's effective surface (m^2)
 Eff_surf_new = Surf/(Num_litz)						; // Effective surface of one small conductor (assume Rc>delta ==> not true if nb_cond>21)
-Rc = ((Eff_surf_new)+(Pi*Delta*Delta))/(2*Pi*Delta)	; // Small conductors radius
+Rc = ((Eff_surf_new)+(Pi*Delta*Delta))/(2*Pi*Delta)			; // Small conductors radius
 
 //Physical tags
 SKIN_AIRBOX      = 500000;
