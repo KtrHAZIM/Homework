@@ -145,4 +145,7 @@ Physical Line("Airbox Skin", SKIN_AIRBOX) ={x()}                     ;
 Physical Line("Skin of conductors",SKIN_CONDUCTORS) = {b_c()}        ;
 If (Flag_Insulation)
 	Physical Surface("Surface of Insulations",SURF_INSULATIONS)={e()};
+	Color Orange{Surface{e()};} //Coloring the surface
 EndIf
+
+Color Gray20{Surface{d(0)};}
